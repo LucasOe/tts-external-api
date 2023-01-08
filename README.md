@@ -29,8 +29,7 @@ You can send four types of outgoing messages:
 ### [Get Lua Scripts](https://api.tabletopsimulator.com/externaleditorapi/#get-lua-scripts)
 
 ```rs
-use serde_json::Value;
-use ttsst::{ExternalEditorApi, AnswerReload};
+use ttsst::{ExternalEditorApi, AnswerReload, Value};
 
 fn get_lua_scripts(api: ExternalEditorApi) {
 	let answer_reload: AnswerReload = api.get_scripts();
@@ -42,8 +41,7 @@ fn get_lua_scripts(api: ExternalEditorApi) {
 ### [Save & Play](https://api.tabletopsimulator.com/externaleditorapi/#save-play)
 
 ```rs
-use serde_json::json;
-use ttsst::{ExternalEditorApi, AnswerReload};
+use ttsst::{json, ExternalEditorApi, AnswerReload};
 
 fn save_and_play(api: ExternalEditorApi) {
 	// Objects not mentioned in the script_states are not updated.
@@ -55,8 +53,7 @@ fn save_and_play(api: ExternalEditorApi) {
 ### [Custom Message](https://api.tabletopsimulator.com/externaleditorapi/#custom-message)
 
 ```rs
-use serde_json::{json, Value};
-use ttsst::ExternalEditorApi;
+use ttsst::{json, ExternalEditorApi, Value};
 
 fn custom_message(api: ExternalEditorApi) {
 	let message: Value = json![{"foo": "Foo", "bar": "Bar"}];
@@ -67,8 +64,7 @@ fn custom_message(api: ExternalEditorApi) {
 ### [Execute Lua Script](https://api.tabletopsimulator.com/externaleditorapi/#execute-lua-code)
 
 ```rs
-use serde_json::Value;
-use ttsst::{AnswerReturn, ExternalEditorApi};
+use ttsst::{AnswerReturn, ExternalEditorApi, Value};
 
 fn execute_lua_script(api: ExternalEditorApi) {
     // tables have to be encoded

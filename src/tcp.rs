@@ -24,7 +24,6 @@ impl ExternalEditorApi {
         let (mut stream, _addr) = self.listener.accept().unwrap();
         let mut buffer = String::new();
         stream.read_to_string(&mut buffer).unwrap();
-        println!("{}", buffer);
         serde_json::from_str(&buffer).unwrap()
     }
 

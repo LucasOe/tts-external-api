@@ -10,7 +10,7 @@ pub use crate::tcp::ExternalEditorApi;
 use serde::{
     Deserialize, Serialize, Serializer, __private::ser::FlatMapSerializer, ser::SerializeMap,
 };
-use serde_json::Value;
+pub use serde_json::{json, Value};
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -502,8 +502,7 @@ impl ExternalEditorApi {
 
 #[cfg(test)]
 mod tests {
-    use crate::{AnswerNewObject, ExternalEditorApi};
-    use serde_json::{json, Value};
+    use crate::{json, AnswerNewObject, ExternalEditorApi, Value};
 
     #[test]
     fn test_get_scripts() {

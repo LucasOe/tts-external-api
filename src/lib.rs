@@ -444,7 +444,11 @@ impl TryFrom<Answer> for AnswerCustomMessage {
 pub struct AnswerReturn {
     #[serde(rename = "returnID")]
     pub return_id: u64,
-    #[serde(rename = "returnValue", deserialize_with = "deserialize_json_decode")]
+    #[serde(
+        rename = "returnValue",
+        deserialize_with = "deserialize_json_string",
+        default
+    )]
     pub return_value: Value,
 }
 
@@ -460,7 +464,7 @@ impl TryFrom<Answer> for AnswerReturn {
 
 /// Returns the return value of the message as a [`Value`]. Valid JSON strings get deserialized if possible.
 /// If deserialization fails JSON strings get returned as a [`Value::String`] instead.
-pub fn deserialize_json_decode<'de, D>(deserializer: D) -> Result<Value, D::Error>
+pub fn deserialize_json_string<'de, D>(deserializer: D) -> Result<Value, D::Error>
 where
     D: Deserializer<'de>,
 {

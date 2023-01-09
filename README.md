@@ -18,7 +18,7 @@ use ttsst::ExternalEditorApi;
 
 fn main() {
 	let api = ExternalEditorApi::new();
-	api.execute(String::from("print('Hello World')"));
+	api.execute(String::from("print('Hello World')")).unwrap();
 }
 ```
 
@@ -32,7 +32,7 @@ You can send four types of outgoing messages:
 use ttsst::{ExternalEditorApi, AnswerReload, Value};
 
 fn get_lua_scripts(api: ExternalEditorApi) {
-	let answer_reload: AnswerReload = api.get_scripts();
+	let answer_reload: AnswerReload = api.get_scripts().unwrap();
 	let script_states: Value = answer_reload.script_states();
 	println!("{:#?}", script_states);
 }
@@ -45,7 +45,7 @@ use ttsst::{json, ExternalEditorApi, AnswerReload};
 
 fn save_and_play(api: ExternalEditorApi) {
 	// Objects not mentioned in the script_states are not updated.
-	let answer_reload: AnswerReload = api.reload(json!([]));
+	let answer_reload: AnswerReload = api.reload(json!([])).unwrap();
 	println!("{:#?}", answer_reload);
 }
 ```
@@ -57,7 +57,7 @@ use ttsst::{json, ExternalEditorApi, Value};
 
 fn custom_message(api: ExternalEditorApi) {
 	let message: Value = json![{"foo": "Foo", "bar": "Bar"}];
-	api.custom_message(message);
+	api.custom_message(message).unwrap();
 }
 ```
 
@@ -70,7 +70,7 @@ fn execute_lua_script(api: ExternalEditorApi) {
     // tables have to be encoded
     let answer_return: AnswerReturn = api.execute(String::from(
         "return JSON.encode({foo = 'Foo', bar = 'Bar'})",
-    ));
+    )).unwrap();
     // `return_value()` will decode strings if possible
     let return_value: Value = answer_return.return_value();
     println!("{:#?}", return_value);

@@ -1,5 +1,5 @@
 use crate::{Answer, Message};
-use std::io::{Read, Write};
+use std::io::{self, Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 #[derive(Debug)]
@@ -13,11 +13,12 @@ impl ExternalEditorApi {
         Self { listener }
     }
 
-    pub fn send(&self, message: Message) {
-        let mut stream = TcpStream::connect("127.0.0.1:39999").unwrap();
+    pub fn send(&self, message: Message) -> io::Result<()> {
+        let mut stream = TcpStream::connect("127.0.0.1:39999")?;
         let json_message = serde_json::to_string(&message).unwrap();
         stream.write_all(json_message.as_bytes()).unwrap();
         stream.flush().unwrap();
+        Ok(())
     }
 
     pub fn read(&self) -> Answer {

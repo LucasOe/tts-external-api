@@ -11,6 +11,7 @@ pub use crate::tcp::ExternalEditorApi;
 use error::Error;
 use serde::{
     Deserialize, Serialize, Serializer, __private::ser::FlatMapSerializer, ser::SerializeMap,
+    Deserializer,
 };
 pub use serde_json::{json, Value};
 
@@ -443,8 +444,8 @@ impl TryFrom<Answer> for AnswerCustomMessage {
 pub struct AnswerReturn {
     #[serde(rename = "returnID")]
     pub return_id: u64,
-    #[serde(rename = "returnValue")]
-    pub return_value: Option<Value>,
+    #[serde(rename = "returnValue", deserialize_with = "deserialize_json_decode")]
+    pub return_value: Value,
 }
 
 impl TryFrom<Answer> for AnswerReturn {
@@ -457,17 +458,18 @@ impl TryFrom<Answer> for AnswerReturn {
     }
 }
 
-impl AnswerReturn {
-    /// Returns the return value of the message as a [`Value`]. Valid JSON strings get deserialized if possible.
-    /// If deserialization fails JSON strings get returned as a [`Value::String`] instead.
-    pub fn return_value(&self) -> Value {
-        match self.return_value.clone() {
-            None => Value::Null,
-            Some(val) => match val {
-                Value::String(val) => serde_json::from_str(&val).unwrap_or(Value::String(val)),
-                other => other,
-            },
-        }
+/// Returns the return value of the message as a [`Value`]. Valid JSON strings get deserialized if possible.
+/// If deserialization fails JSON strings get returned as a [`Value::String`] instead.
+pub fn deserialize_json_decode<'de, D>(deserializer: D) -> Result<Value, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    match Option::deserialize(deserializer)? {
+        Some(val) => match val {
+            Value::String(val) => Ok(serde_json::from_str(&val).unwrap_or(Value::String(val))),
+            other => Ok(other),
+        },
+        None => Ok(Value::Null),
     }
 }
 

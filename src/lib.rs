@@ -15,6 +15,7 @@ use std::io::{self};
 
 /////////////////////////////////////////////////////////////////////////////
 
+/// Represents outgoing messages sent to Tabletop Simulator.
 #[derive(Debug)]
 pub enum Message {
     MessageGetScripts(MessageGetScripts),
@@ -67,7 +68,7 @@ impl Serialize for Message {
 
 pub struct TryFromMessageError(Message);
 
-/// Get a list containing the states for every object. Returns an `AnswerReload` message.
+/// Get a list containing the states for every object. Returns an [`AnswerReload`] message.
 #[derive(Serialize, Debug)]
 pub struct MessageGetScripts {}
 
@@ -89,7 +90,7 @@ impl MessageGetScripts {
 
 /// Update the Lua scripts and UI XML for any objects listed in the message,
 /// and then reloads the save file, the same way it does when pressing "Save & Play" within the in-game editor.
-/// Returns an `AnswerReload` message.
+/// Returns an [`AnswerReload`] message.
 ///
 /// Any objects mentioned have both their Lua script and their UI XML updated.
 /// If no value is set for either the "script" or "ui" key then the
@@ -117,9 +118,9 @@ impl MessageReload {
 }
 
 /// Send a custom message to be forwarded to the `onExternalMessage` event handler
-/// in the currently loaded game. The value of customMessage must be a table,
+/// in the currently loaded game. The value of customMessage must be an object,
 /// and is passed as a parameter to the event handler.
-/// If this value is not a table then the event is not triggered.
+/// If this value is not an object then the event is not triggered.
 #[derive(Serialize, Debug)]
 pub struct MessageCustomMessage {
     #[serde(rename = "customMessage")]
@@ -142,7 +143,7 @@ impl MessageCustomMessage {
     }
 }
 
-/// Executes a lua script and returns the value in a `AnswerReturn` message.
+/// Executes a lua script and returns the value in a [`AnswerReturn`] message.
 /// Using a guid of "-1" runs the script globally.
 #[derive(Serialize, Debug)]
 pub struct MessageExectute {
@@ -176,6 +177,7 @@ impl MessageExectute {
 
 /////////////////////////////////////////////////////////////////////////////
 
+/// Represents incoming messages sent by Tabletop Simulator.
 #[derive(Debug)]
 pub enum Answer {
     AnswerNewObject(AnswerNewObject),
@@ -236,7 +238,7 @@ pub struct TryFromAnswerError(Answer);
 
 /// When clicking on "Scripting Editor" in the right click contextual menu
 /// in TTS for an object that doesn't have a Lua Script yet, TTS will send
-/// an `AnswerNewObject` message containing data for the object.
+/// an [`AnswerNewObject`] message containing data for the object.
 ///
 /// # Example
 /// ```json
@@ -268,9 +270,9 @@ impl TryFrom<Answer> for AnswerNewObject {
 }
 
 /// After loading a new game in TTS, TTS will send all the Lua scripts
-/// and UI XML from the new game as an `AnswerReload`.
+/// and UI XML from the new game as an [`AnswerReload`].
 ///
-/// TTS sends this message as a response to `MessageGetScripts` and `MessageReload`.
+/// TTS sends this message as a response to [`MessageGetScripts`] and [`MessageReload`].
 ///
 /// # Example
 /// ```json
@@ -315,7 +317,7 @@ impl AnswerReload {
     }
 }
 
-/// TTS sends all `print()` messages in a `AnswerPrint` response.
+/// TTS sends all `print()` messages in a [`AnswerPrint`] response.
 ///
 /// # Example
 /// ```json
@@ -340,7 +342,7 @@ impl TryFrom<Answer> for AnswerPrint {
     }
 }
 
-/// TTS sends all error messages in a `AnswerError` response.
+/// TTS sends all error messages in a [`AnswerError`] response.
 ///
 /// # Example
 /// ```json
@@ -371,7 +373,7 @@ impl TryFrom<Answer> for AnswerError {
     }
 }
 
-/// Custom Messages are sent by calling `sendExternalMessage` with the table of data you wish to send.
+/// Custom Messages are sent by calling [`sendExternalMessage`] with the table of data you wish to send.
 ///
 /// # Example
 /// ```json
@@ -396,10 +398,9 @@ impl TryFrom<Answer> for AnswerCustomMessage {
     }
 }
 
-/// If code executed with a `MessageExecute` message returns a value,
-/// it will be sent back in a `AnswerReturn` message.
-///
-/// Return values can only be strings. Tables have to be decoded using `JSON.decode(table)`.
+/// If code executed with a [`MessageExecute`] message returns a value,
+/// it will be sent back in a [`AnswerReturn`] message.
+/// Tables have to be decoded using `JSON.decode(table)`.
 ///
 /// # Example
 /// ```json
@@ -427,6 +428,8 @@ impl TryFrom<Answer> for AnswerReturn {
 }
 
 impl AnswerReturn {
+    /// Returns the return value of the message as a [`Value`]. Valid JSON strings get deserialized if possible.
+    /// If deserialization fails JSON strings get returned as a [`Value::String`] instead.
     pub fn return_value(&self) -> Value {
         match self.return_value.clone() {
             None => Value::Null,
@@ -440,7 +443,7 @@ impl AnswerReturn {
     }
 }
 
-/// Whenever the player saves the game in TTS, `AnswerGameSaved` is sent as a response.
+/// Whenever the player saves the game in TTS, [`AnswerGameSaved`] is sent as a response.
 #[derive(Deserialize, Debug)]
 pub struct AnswerGameSaved {}
 
@@ -454,7 +457,7 @@ impl TryFrom<Answer> for AnswerGameSaved {
     }
 }
 
-/// Whenever the player saves the game in TTS, `AnswerObjectCreated` is sent as a response.
+/// Whenever the player saves the game in TTS, [`AnswerObjectCreated`] is sent as a response.
 ///
 /// # Example
 /// ```json
@@ -482,16 +485,32 @@ impl TryFrom<Answer> for AnswerObjectCreated {
 /////////////////////////////////////////////////////////////////////////////
 
 impl ExternalEditorApi {
+    /// Get a list containing the states for every object. Returns an [`AnswerReload`] message on success.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
     pub fn get_scripts(&self) -> io::Result<AnswerReload> {
         self.send(Message::MessageGetScripts(MessageGetScripts::new()))?;
         Ok(self.wait())
     }
 
+    /// Update the Lua scripts and UI XML for any objects listed in the message,
+    /// and then reloads the save file, the same way it does when pressing "Save & Play" within the in-game editor.
+    /// Returns an [`AnswerReload`] message.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    ///
+    /// Any objects mentioned have both their Lua script and their UI XML updated.
+    /// If no value is set for either the "script" or "ui" key then the
+    /// corresponding Lua script or UI XML is deleted.
     pub fn reload(&self, script_states: Value) -> io::Result<AnswerReload> {
         self.send(Message::MessageReload(MessageReload::new(script_states)))?;
         Ok(self.wait())
     }
 
+    /// Send a custom message to be forwarded to the `onExternalMessage` event handler
+    /// in the currently loaded game. The value of customMessage must be an object,
+    /// and is passed as a parameter to the event handler.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned.
+    ///
+    /// If this value is not an object then the event is not triggered.
     pub fn custom_message(&self, message: Value) -> io::Result<()> {
         self.send(Message::MessageCustomMessage(MessageCustomMessage::new(
             message,
@@ -499,6 +518,9 @@ impl ExternalEditorApi {
         Ok(())
     }
 
+    /// Executes a lua script and returns the value in a [`AnswerReturn`] message.
+    /// Using a guid of "-1" runs the script globally.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
     pub fn execute(&self, script: String) -> io::Result<AnswerReturn> {
         self.send(Message::MessageExectute(MessageExectute::new(script)))?;
         Ok(self.wait())

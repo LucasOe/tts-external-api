@@ -1,5 +1,6 @@
-use crate::{Answer, Message};
-use std::io::{self, Read, Write};
+use crate::{error::Error, Answer, Message};
+use std::fmt::Debug;
+use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 /// A struct representing Tabletop Simulators [External Editor API](https://api.tabletopsimulator.com/externaleditorapi/).
@@ -15,8 +16,8 @@ impl ExternalEditorApi {
         Self { listener }
     }
 
-    /// Sends a [`Message`] in a TcpStream. If no connection to the game can be established, an [`io::Error`] gets returned.
-    pub fn send(&self, message: Message) -> io::Result<()> {
+    /// Sends a [`Message`] in a TcpStream. If no connection to the game can be established, an [`Error::Io`] gets returned.
+    pub fn send(&self, message: Message) -> Result<(), Error> {
         let mut stream = TcpStream::connect("127.0.0.1:39999")?;
         let json_message = serde_json::to_string(&message).unwrap();
         stream.write_all(json_message.as_bytes()).unwrap();

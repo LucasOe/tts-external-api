@@ -192,6 +192,15 @@ impl MessageExectute {
         }
     }
 
+    /// Constructs a new Execute Lua Code Message that executes code on an object
+    pub fn new_object(script: String, guid: String) -> Self {
+        Self {
+            return_id: 5,
+            guid,
+            script,
+        }
+    }
+
     /// Returns self as [`Message::MessageExectute`]
     pub fn as_message(self) -> Message {
         Message::MessageExectute(self)
@@ -535,11 +544,23 @@ impl ExternalEditorApi {
         Ok(())
     }
 
-    /// Executes a lua script and returns the value in a [`AnswerReturn`] message.
-    /// Using a guid of "-1" runs the script globally.
+    /// Executes a lua script globally and returns the value in a [`AnswerReturn`] message.
     /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
     pub fn execute(&self, script: String) -> Result<AnswerReturn, Error> {
         self.send(MessageExectute::new(script).as_message())?;
+        Ok(self.wait())
+    }
+
+    /// Executes a lua script on an object and returns the value in a [`AnswerReturn`] message.
+    /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
+    ///
+    /// To execute Lua code for an object in the game that object must have an associated script in TTS.
+    /// Otherwise the TTS scripting engine will fail with an error "function \<executeScript>:
+    /// Object reference not set to an instance of an object".
+    /// Once the in-game editor shows a script associated with an object
+    /// then TTS will be able to execute Lua code sent via JSON message for that object.
+    pub fn execute_on_object(&self, script: String, guid: String) -> Result<AnswerReturn, Error> {
+        self.send(MessageExectute::new_object(script, guid).as_message())?;
         Ok(self.wait())
     }
 }

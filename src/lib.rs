@@ -148,7 +148,7 @@ impl MessageCustomMessage {
 #[derive(Serialize, Debug)]
 pub struct MessageExectute {
     #[serde(rename = "returnID")]
-    pub return_id: u8,
+    pub return_id: u64,
     #[serde(rename = "guid")]
     pub guid: String,
     #[serde(rename = "script")]
@@ -412,7 +412,7 @@ impl TryFrom<Answer> for AnswerCustomMessage {
 #[derive(Deserialize, Debug)]
 pub struct AnswerReturn {
     #[serde(rename = "returnID")]
-    pub return_id: u8,
+    pub return_id: u64,
     #[serde(rename = "returnValue")]
     pub return_value: Option<Value>,
 }
@@ -433,10 +433,8 @@ impl AnswerReturn {
     pub fn return_value(&self) -> Value {
         match self.return_value.clone() {
             None => Value::Null,
-            Some(value) => match value {
-                Value::String(value) => {
-                    serde_json::from_str(&value).unwrap_or(Value::String(value))
-                }
+            Some(val) => match val {
+                Value::String(val) => serde_json::from_str(&val).unwrap_or(Value::String(val)),
                 other => other,
             },
         }

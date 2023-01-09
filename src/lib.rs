@@ -413,7 +413,7 @@ pub struct AnswerReturn {
     #[serde(rename = "returnID")]
     pub return_id: u8,
     #[serde(rename = "returnValue")]
-    pub return_value: Value,
+    pub return_value: Option<Value>,
 }
 
 impl TryFrom<Answer> for AnswerReturn {
@@ -429,8 +429,13 @@ impl TryFrom<Answer> for AnswerReturn {
 impl AnswerReturn {
     pub fn return_value(&self) -> Value {
         match self.return_value.clone() {
-            Value::String(value) => serde_json::from_str(&value).unwrap_or(Value::String(value)),
-            other => other,
+            None => Value::Null,
+            Some(value) => match value {
+                Value::String(value) => {
+                    serde_json::from_str(&value).unwrap_or(Value::String(value))
+                }
+                other => other,
+            },
         }
     }
 }

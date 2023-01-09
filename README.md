@@ -29,12 +29,11 @@ You can send four types of outgoing messages:
 ### [Get Lua Scripts](https://api.tabletopsimulator.com/externaleditorapi/#get-lua-scripts)
 
 ```rs
-use tts_external_api::{ExternalEditorApi, AnswerReload, Value};
+use tts_external_api::{ExternalEditorApi, AnswerReload};
 
 fn get_lua_scripts(api: ExternalEditorApi) {
 	let answer_reload: AnswerReload = api.get_scripts().unwrap();
-	let script_states: Value = answer_reload.script_states();
-	println!("{:#?}", script_states);
+	println!("{:#?}", answer_reload.script_states);
 }
 ```
 
@@ -44,7 +43,7 @@ fn get_lua_scripts(api: ExternalEditorApi) {
 use tts_external_api::{json, ExternalEditorApi, AnswerReload};
 
 fn save_and_play(api: ExternalEditorApi) {
-	// Objects not mentioned in the script_states are not updated.
+	// Objects not mentioned in the script_states are not updated
 	let answer_reload: AnswerReload = api.reload(json!([])).unwrap();
 	println!("{:#?}", answer_reload);
 }
@@ -64,16 +63,16 @@ fn custom_message(api: ExternalEditorApi) {
 ### [Execute Lua Script](https://api.tabletopsimulator.com/externaleditorapi/#execute-lua-code)
 
 ```rs
-use tts_external_api::{AnswerReturn, ExternalEditorApi, Value};
+use tts_external_api::{AnswerReturn, ExternalEditorApi};
 
 fn execute_lua_script(api: ExternalEditorApi) {
-    // tables have to be encoded
-    let answer_return: AnswerReturn = api.execute(String::from(
-        "return JSON.encode({foo = 'Foo', bar = 'Bar'})",
-    )).unwrap();
-    // `return_value()` will decode strings if possible
-    let return_value: Value = answer_return.return_value();
-    println!("{:#?}", return_value);
+    // JSON strings will be deserialized if possible
+    let answer_return: AnswerReturn = api
+        .execute(String::from(
+            "return JSON.encode({foo = 'Foo', bar = 'Bar'})",
+        ))
+        .unwrap();
+    println!("{:#?}", answer_return.return_value);
 }
 ```
 

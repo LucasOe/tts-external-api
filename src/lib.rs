@@ -4,14 +4,15 @@
 //! one where TTS listens for messages and one where ttsst listens for messages.
 //! All communication messages are JSON.
 
-mod tcp;
+pub mod error;
+pub mod tcp;
 
 pub use crate::tcp::ExternalEditorApi;
+use error::Error;
 use serde::{
     Deserialize, Serialize, Serializer, __private::ser::FlatMapSerializer, ser::SerializeMap,
 };
 pub use serde_json::{json, Value};
-use std::io::{self};
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -66,18 +67,16 @@ impl Serialize for Message {
     }
 }
 
-pub struct TryFromMessageError(Message);
-
 /// Get a list containing the states for every object. Returns an [`AnswerReload`] message.
 #[derive(Serialize, Debug)]
 pub struct MessageGetScripts {}
 
 impl TryFrom<Message> for MessageGetScripts {
-    type Error = TryFromMessageError;
+    type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
             Message::MessageGetScripts(message) => Ok(message),
-            other => Err(TryFromMessageError(other)),
+            other => Err(Error::MessageError(other)),
         }
     }
 }
@@ -102,11 +101,11 @@ pub struct MessageReload {
 }
 
 impl TryFrom<Message> for MessageReload {
-    type Error = TryFromMessageError;
+    type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
             Message::MessageReload(message) => Ok(message),
-            other => Err(TryFromMessageError(other)),
+            other => Err(Error::MessageError(other)),
         }
     }
 }
@@ -128,11 +127,11 @@ pub struct MessageCustomMessage {
 }
 
 impl TryFrom<Message> for MessageCustomMessage {
-    type Error = TryFromMessageError;
+    type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
             Message::MessageCustomMessage(message) => Ok(message),
-            other => Err(TryFromMessageError(other)),
+            other => Err(Error::MessageError(other)),
         }
     }
 }
@@ -156,11 +155,11 @@ pub struct MessageExectute {
 }
 
 impl TryFrom<Message> for MessageExectute {
-    type Error = TryFromMessageError;
+    type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
             Message::MessageExectute(message) => Ok(message),
-            other => Err(TryFromMessageError(other)),
+            other => Err(Error::MessageError(other)),
         }
     }
 }
@@ -234,8 +233,6 @@ impl<'de> serde::Deserialize<'de> for Answer {
     }
 }
 
-pub struct TryFromAnswerError(Answer);
-
 /// When clicking on "Scripting Editor" in the right click contextual menu
 /// in TTS for an object that doesn't have a Lua Script yet, TTS will send
 /// an [`AnswerNewObject`] message containing data for the object.
@@ -260,11 +257,11 @@ pub struct AnswerNewObject {
 }
 
 impl TryFrom<Answer> for AnswerNewObject {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerNewObject(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -302,11 +299,11 @@ pub struct AnswerReload {
 }
 
 impl TryFrom<Answer> for AnswerReload {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerReload(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -333,11 +330,11 @@ pub struct AnswerPrint {
 }
 
 impl TryFrom<Answer> for AnswerPrint {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerPrint(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -364,11 +361,11 @@ pub struct AnswerError {
 }
 
 impl TryFrom<Answer> for AnswerError {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerError(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -389,11 +386,11 @@ pub struct AnswerCustomMessage {
 }
 
 impl TryFrom<Answer> for AnswerCustomMessage {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerCustomMessage(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -418,11 +415,11 @@ pub struct AnswerReturn {
 }
 
 impl TryFrom<Answer> for AnswerReturn {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerReturn(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -446,11 +443,11 @@ impl AnswerReturn {
 pub struct AnswerGameSaved {}
 
 impl TryFrom<Answer> for AnswerGameSaved {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerGameSaved(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -471,11 +468,11 @@ pub struct AnswerObjectCreated {
 }
 
 impl TryFrom<Answer> for AnswerObjectCreated {
-    type Error = TryFromAnswerError;
+    type Error = Error;
     fn try_from(answer: Answer) -> Result<Self, Self::Error> {
         match answer {
             Answer::AnswerObjectCreated(message) => Ok(message),
-            other => Err(TryFromAnswerError(other)),
+            other => Err(Error::AnswerError(other)),
         }
     }
 }
@@ -484,8 +481,8 @@ impl TryFrom<Answer> for AnswerObjectCreated {
 
 impl ExternalEditorApi {
     /// Get a list containing the states for every object. Returns an [`AnswerReload`] message on success.
-    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
-    pub fn get_scripts(&self) -> io::Result<AnswerReload> {
+    /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
+    pub fn get_scripts(&self) -> Result<AnswerReload, Error> {
         self.send(Message::MessageGetScripts(MessageGetScripts::new()))?;
         Ok(self.wait())
     }
@@ -493,12 +490,12 @@ impl ExternalEditorApi {
     /// Update the Lua scripts and UI XML for any objects listed in the message,
     /// and then reloads the save file, the same way it does when pressing "Save & Play" within the in-game editor.
     /// Returns an [`AnswerReload`] message.
-    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
     ///
     /// Any objects mentioned have both their Lua script and their UI XML updated.
     /// If no value is set for either the "script" or "ui" key then the
     /// corresponding Lua script or UI XML is deleted.
-    pub fn reload(&self, script_states: Value) -> io::Result<AnswerReload> {
+    pub fn reload(&self, script_states: Value) -> Result<AnswerReload, Error> {
         self.send(Message::MessageReload(MessageReload::new(script_states)))?;
         Ok(self.wait())
     }
@@ -506,10 +503,10 @@ impl ExternalEditorApi {
     /// Send a custom message to be forwarded to the `onExternalMessage` event handler
     /// in the currently loaded game. The value of customMessage must be an object,
     /// and is passed as a parameter to the event handler.
-    /// If no connection to the game can be established, an [`io::Error`] gets returned.
+    /// If no connection to the game can be established, an [`Error::Io`] gets returned.
     ///
     /// If this value is not an object then the event is not triggered.
-    pub fn custom_message(&self, message: Value) -> io::Result<()> {
+    pub fn custom_message(&self, message: Value) -> Result<(), Error> {
         self.send(Message::MessageCustomMessage(MessageCustomMessage::new(
             message,
         )))?;
@@ -518,8 +515,8 @@ impl ExternalEditorApi {
 
     /// Executes a lua script and returns the value in a [`AnswerReturn`] message.
     /// Using a guid of "-1" runs the script globally.
-    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
-    pub fn execute(&self, script: String) -> io::Result<AnswerReturn> {
+    /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
+    pub fn execute(&self, script: String) -> Result<AnswerReturn, Error> {
         self.send(Message::MessageExectute(MessageExectute::new(script)))?;
         Ok(self.wait())
     }

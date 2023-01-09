@@ -82,8 +82,14 @@ impl TryFrom<Message> for MessageGetScripts {
 }
 
 impl MessageGetScripts {
+    /// Constructs a new Get Lua Scripts Message
     pub fn new() -> Self {
         Self {}
+    }
+
+    /// Returns self as [`Message::MessageGetScript`]
+    pub fn as_message(self) -> Message {
+        Message::MessageGetScripts(self)
     }
 }
 
@@ -111,8 +117,14 @@ impl TryFrom<Message> for MessageReload {
 }
 
 impl MessageReload {
+    /// Constructs a new Save & Play Message
     pub fn new(script_states: Value) -> Self {
         Self { script_states }
+    }
+
+    /// Returns self as [`Message::MessageReload`]
+    pub fn as_message(self) -> Message {
+        Message::MessageReload(self)
     }
 }
 
@@ -137,8 +149,14 @@ impl TryFrom<Message> for MessageCustomMessage {
 }
 
 impl MessageCustomMessage {
+    /// Constructs a new Custom Message
     pub fn new(custom_message: Value) -> Self {
         Self { custom_message }
+    }
+
+    /// Returns self as [`Message::MessageCustomMessage`]
+    pub fn as_message(self) -> Message {
+        Message::MessageCustomMessage(self)
     }
 }
 
@@ -165,12 +183,18 @@ impl TryFrom<Message> for MessageExectute {
 }
 
 impl MessageExectute {
+    /// Constructs a new Execute Lua Code Message that executes code globally
     pub fn new(script: String) -> Self {
         Self {
             return_id: 5,
             guid: String::from("-1"),
             script,
         }
+    }
+
+    /// Returns self as [`Message::MessageExectute`]
+    pub fn as_message(self) -> Message {
+        Message::MessageExectute(self)
     }
 }
 
@@ -483,7 +507,7 @@ impl ExternalEditorApi {
     /// Get a list containing the states for every object. Returns an [`AnswerReload`] message on success.
     /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
     pub fn get_scripts(&self) -> Result<AnswerReload, Error> {
-        self.send(Message::MessageGetScripts(MessageGetScripts::new()))?;
+        self.send(MessageGetScripts::new().as_message())?;
         Ok(self.wait())
     }
 
@@ -496,7 +520,7 @@ impl ExternalEditorApi {
     /// If no value is set for either the "script" or "ui" key then the
     /// corresponding Lua script or UI XML is deleted.
     pub fn reload(&self, script_states: Value) -> Result<AnswerReload, Error> {
-        self.send(Message::MessageReload(MessageReload::new(script_states)))?;
+        self.send(MessageReload::new(script_states).as_message())?;
         Ok(self.wait())
     }
 
@@ -507,9 +531,7 @@ impl ExternalEditorApi {
     ///
     /// If this value is not an object then the event is not triggered.
     pub fn custom_message(&self, message: Value) -> Result<(), Error> {
-        self.send(Message::MessageCustomMessage(MessageCustomMessage::new(
-            message,
-        )))?;
+        self.send(MessageCustomMessage::new(message).as_message())?;
         Ok(())
     }
 
@@ -517,7 +539,7 @@ impl ExternalEditorApi {
     /// Using a guid of "-1" runs the script globally.
     /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
     pub fn execute(&self, script: String) -> Result<AnswerReturn, Error> {
-        self.send(Message::MessageExectute(MessageExectute::new(script)))?;
+        self.send(MessageExectute::new(script).as_message())?;
         Ok(self.wait())
     }
 }

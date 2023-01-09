@@ -11,6 +11,7 @@ use serde::{
     Deserialize, Serialize, Serializer, __private::ser::FlatMapSerializer, ser::SerializeMap,
 };
 pub use serde_json::{json, Value};
+use std::io::{self};
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -476,25 +477,26 @@ impl TryFrom<Answer> for AnswerObjectCreated {
 /////////////////////////////////////////////////////////////////////////////
 
 impl ExternalEditorApi {
-    pub fn get_scripts(&self) -> AnswerReload {
-        self.send(Message::MessageGetScripts(MessageGetScripts::new()));
-        self.wait()
+    pub fn get_scripts(&self) -> io::Result<AnswerReload> {
+        self.send(Message::MessageGetScripts(MessageGetScripts::new()))?;
+        Ok(self.wait())
     }
 
-    pub fn reload(&self, script_states: Value) -> AnswerReload {
-        self.send(Message::MessageReload(MessageReload::new(script_states)));
-        self.wait()
+    pub fn reload(&self, script_states: Value) -> io::Result<AnswerReload> {
+        self.send(Message::MessageReload(MessageReload::new(script_states)))?;
+        Ok(self.wait())
     }
 
-    pub fn custom_message(&self, message: Value) {
+    pub fn custom_message(&self, message: Value) -> io::Result<()> {
         self.send(Message::MessageCustomMessage(MessageCustomMessage::new(
             message,
-        )));
+        )))?;
+        Ok(())
     }
 
-    pub fn execute(&self, script: String) -> AnswerReturn {
-        self.send(Message::MessageExectute(MessageExectute::new(script)));
-        self.wait()
+    pub fn execute(&self, script: String) -> io::Result<AnswerReturn> {
+        self.send(Message::MessageExectute(MessageExectute::new(script)))?;
+        Ok(self.wait())
     }
 }
 
@@ -508,7 +510,7 @@ mod tests {
     fn test_get_scripts() {
         let api = ExternalEditorApi::new();
 
-        let script_states: Value = api.get_scripts().script_states();
+        let script_states: Value = api.get_scripts().unwrap().script_states();
         println!("{:#?}", script_states);
     }
 
@@ -516,8 +518,7 @@ mod tests {
     fn test_reload() {
         let api = ExternalEditorApi::new();
 
-        let script_states = api.get_scripts().script_states();
-        let script_states = api.reload(script_states).script_states();
+        let script_states = api.reload(json!([])).unwrap().script_states();
         println!("{:#?}", script_states);
     }
 
@@ -525,14 +526,16 @@ mod tests {
     fn test_custom_message() {
         let api = ExternalEditorApi::new();
 
-        api.custom_message(json![{"foo": "Foo", "bar": "Bar"}]);
+        api.custom_message(json![{"foo": "Foo"}]).unwrap();
     }
 
     #[test]
     fn test_execute() {
         let api = ExternalEditorApi::new();
 
-        let answer = api.execute(String::from("return JSON.encode('5')"));
+        let answer = api
+            .execute(String::from("return JSON.encode({foo = 'Foo'})"))
+            .unwrap();
         println!("{:#?}", answer);
     }
 

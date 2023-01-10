@@ -1,4 +1,4 @@
-//! Reference: https://api.tabletopsimulator.com/externaleditorapi/
+//! Reference: <https://api.tabletopsimulator.com/externaleditorapi/>
 //!
 //! Communication between the editor and TTS occurs via two localhost TCP connections:
 //! one where TTS listens for messages and one where ttsst listens for messages.
@@ -23,7 +23,7 @@ pub enum Message {
     MessageGetScripts(MessageGetScripts),
     MessageReload(MessageReload),
     MessageCustomMessage(MessageCustomMessage),
-    MessageExectute(MessageExectute),
+    MessageExectute(MessageExecute),
 }
 
 // Workaround for: https://github.com/serde-rs/serde/issues/745
@@ -88,7 +88,7 @@ impl MessageGetScripts {
         Self {}
     }
 
-    /// Returns self as [`Message::MessageGetScript`]
+    /// Returns self as [`Message::MessageGetScripts`]
     pub fn as_message(self) -> Message {
         Message::MessageGetScripts(self)
     }
@@ -164,7 +164,7 @@ impl MessageCustomMessage {
 /// Executes a lua script and returns the value in a [`AnswerReturn`] message.
 /// Using a guid of "-1" runs the script globally.
 #[derive(Serialize, Debug)]
-pub struct MessageExectute {
+pub struct MessageExecute {
     #[serde(rename = "returnID")]
     pub return_id: u64,
     #[serde(rename = "guid")]
@@ -173,7 +173,7 @@ pub struct MessageExectute {
     pub script: String,
 }
 
-impl TryFrom<Message> for MessageExectute {
+impl TryFrom<Message> for MessageExecute {
     type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
@@ -183,7 +183,7 @@ impl TryFrom<Message> for MessageExectute {
     }
 }
 
-impl MessageExectute {
+impl MessageExecute {
     /// Constructs a new Execute Lua Code Message that executes code globally
     pub fn new(script: String) -> Self {
         Self {
@@ -404,7 +404,7 @@ impl TryFrom<Answer> for AnswerError {
     }
 }
 
-/// Custom Messages are sent by calling [`sendExternalMessage`] with the table of data you wish to send.
+/// Custom Messages are sent by calling `sendExternalMessage` with the table of data you wish to send.
 ///
 /// # Example
 /// ```json
@@ -553,7 +553,7 @@ impl ExternalEditorApi {
     /// Executes a lua script globally and returns the value in a [`AnswerReturn`] message.
     /// If no connection to the game can be established, an [`Error::Io`] gets returned instead.
     pub fn execute(&self, script: String) -> Result<AnswerReturn, Error> {
-        self.send(MessageExectute::new(script).as_message())?;
+        self.send(MessageExecute::new(script).as_message())?;
         Ok(self.wait())
     }
 
@@ -566,7 +566,7 @@ impl ExternalEditorApi {
     /// Once the in-game editor shows a script associated with an object
     /// then TTS will be able to execute Lua code sent via JSON message for that object.
     pub fn execute_on_object(&self, script: String, guid: String) -> Result<AnswerReturn, Error> {
-        self.send(MessageExectute::new_object(script, guid).as_message())?;
+        self.send(MessageExecute::new_object(script, guid).as_message())?;
         Ok(self.wait())
     }
 }

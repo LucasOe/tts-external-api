@@ -569,22 +569,22 @@ impl ExternalEditorApi {
 
 #[cfg(test)]
 mod tests {
-    use crate::{json, AnswerNewObject, ExternalEditorApi, Value};
+    use crate::{json, AnswerNewObject, ExternalEditorApi};
 
     #[test]
     fn test_get_scripts() {
         let api = ExternalEditorApi::new();
 
-        let script_states: Value = api.get_scripts().unwrap().script_states();
-        println!("{:#?}", script_states);
+        let answer = api.get_scripts().unwrap();
+        println!("{:#?}", answer.script_states);
     }
 
     #[test]
     fn test_reload() {
         let api = ExternalEditorApi::new();
 
-        let script_states = api.reload(json!([])).unwrap().script_states();
-        println!("{:#?}", script_states);
+        let answer = api.reload(json!([])).unwrap();
+        println!("{:#?}", answer.script_states);
     }
 
     #[test]

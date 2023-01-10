@@ -1,3 +1,5 @@
+//! The TCP connection used for communication between the external API and Tabletop Simulator
+
 use crate::messages::{Answer, Message};
 use std::fmt::Debug;
 use std::io::{self, Read, Write};
@@ -42,5 +44,13 @@ impl ExternalEditorApi {
                 return answer;
             }
         }
+    }
+}
+
+/// Creates a new ExternalEditorApi struct and binds the TcpListener to its socket adress.
+/// This is functionally the same as using `ExternalEditorApi::new()`.
+impl Default for ExternalEditorApi {
+    fn default() -> Self {
+        Self::new()
     }
 }

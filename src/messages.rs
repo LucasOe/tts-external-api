@@ -1,17 +1,22 @@
-use crate::{error::Error, tcp::ExternalEditorApi};
+//! In- and Outcoming messages
+
+use crate::{error::Error, tcp::ExternalEditorApi, Value};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::{__private::ser::FlatMapSerializer, ser::SerializeMap};
-use serde_json::Value;
 use std::io::{self};
 
 /////////////////////////////////////////////////////////////////////////////
 
-/// Represents outgoing messages sent to Tabletop Simulator.
+/// Represents outgoing messages sent to Tabletop Simulator
 #[derive(Debug)]
 pub enum Message {
+    /// Represents [Get Lua Scripts](https://api.tabletopsimulator.com/externaleditorapi/#get-lua-scripts)
     MessageGetScripts(MessageGetScripts),
+    /// Represents [Save & Play](https://api.tabletopsimulator.com/externaleditorapi/#get-lua-scripts)
     MessageReload(MessageReload),
+    /// Represents [Custom Message](https://api.tabletopsimulator.com/externaleditorapi/#custom-message)
     MessageCustomMessage(MessageCustomMessage),
+    /// Represents [Execute Lua Code](https://api.tabletopsimulator.com/externaleditorapi/#execute-lua-code)
     MessageExectute(MessageExecute),
 }
 
@@ -92,6 +97,7 @@ impl MessageGetScripts {
 /// corresponding Lua script or UI XML is deleted.
 #[derive(Serialize, Debug)]
 pub struct MessageReload {
+    /// Contains a list objects and their state
     #[serde(rename = "scriptStates")]
     pub script_states: Value,
 }
@@ -124,6 +130,7 @@ impl MessageReload {
 /// If this value is not an object then the event is not triggered.
 #[derive(Serialize, Debug)]
 pub struct MessageCustomMessage {
+    /// Custom message that gets forwarded
     #[serde(rename = "customMessage")]
     pub custom_message: Value,
 }
@@ -154,10 +161,13 @@ impl MessageCustomMessage {
 /// Using a guid of "-1" runs the script globally.
 #[derive(Serialize, Debug)]
 pub struct MessageExecute {
+    /// Return Id of the execute message
     #[serde(rename = "returnID")]
     pub return_id: u64,
+    /// The guid the message gets executed on
     #[serde(rename = "guid")]
     pub guid: String,
+    /// The script that gets executed
     #[serde(rename = "script")]
     pub script: String,
 }
@@ -202,13 +212,21 @@ impl MessageExecute {
 /// Represents incoming messages sent by Tabletop Simulator.
 #[derive(Debug)]
 pub enum Answer {
+    /// Represents [Pushing New Object](https://api.tabletopsimulator.com/externaleditorapi/#pushing-new-object)
     AnswerNewObject(AnswerNewObject),
+    /// Represents [Loading a new Game](https://api.tabletopsimulator.com/externaleditorapi/#loading-a-new-game)
     AnswerReload(AnswerReload),
+    /// Represents [Print/Debug Messages](https://api.tabletopsimulator.com/externaleditorapi/#printdebug-messages)
     AnswerPrint(AnswerPrint),
+    /// Represents [Error Messages](https://api.tabletopsimulator.com/externaleditorapi/#error-messages)
     AnswerError(AnswerError),
+    /// Represents [Custom Messages](https://api.tabletopsimulator.com/externaleditorapi/#custom-messages)
     AnswerCustomMessage(AnswerCustomMessage),
+    /// Represents [Return Messages](https://api.tabletopsimulator.com/externaleditorapi/#return-messages)
     AnswerReturn(AnswerReturn),
+    /// Represents [Game Saved](https://api.tabletopsimulator.com/externaleditorapi/#game-saved)
     AnswerGameSaved(AnswerGameSaved),
+    /// Represents [Object Created](https://api.tabletopsimulator.com/externaleditorapi/#object-created)
     AnswerObjectCreated(AnswerObjectCreated),
 }
 
@@ -275,6 +293,7 @@ impl<'de> serde::Deserialize<'de> for Answer {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerNewObject {
+    /// Contains the state of the object
     #[serde(rename = "scriptStates")]
     pub script_states: Value,
 }
@@ -315,8 +334,10 @@ impl TryFrom<Answer> for AnswerNewObject {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerReload {
+    /// Path to the save file of the current save
     #[serde(rename = "savePath")]
     pub save_path: String,
+    /// Contains a list objects and their state
     #[serde(rename = "scriptStates")]
     pub script_states: Value,
 }
@@ -342,6 +363,7 @@ impl TryFrom<Answer> for AnswerReload {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerPrint {
+    /// Message that got printed
     #[serde(rename = "message")]
     pub message: String,
 }
@@ -369,10 +391,13 @@ impl TryFrom<Answer> for AnswerPrint {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerError {
+    /// Desciption of the error
     #[serde(rename = "error")]
     pub error: String,
+    /// Guid of the object that has the error
     #[serde(rename = "guid")]
     pub guid: String,
+    /// Description of the error
     #[serde(rename = "errorMessagePrefix")]
     pub error_message_prefix: String,
 }
@@ -398,6 +423,7 @@ impl TryFrom<Answer> for AnswerError {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerCustomMessage {
+    /// Content of the custom message
     #[serde(rename = "customMessage")]
     pub custom_message: Value,
 }
@@ -425,6 +451,7 @@ impl TryFrom<Answer> for AnswerCustomMessage {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerReturn {
+    /// Return Id of message that got executed
     #[serde(rename = "returnID")]
     pub return_id: u64,
     #[serde(
@@ -432,6 +459,7 @@ pub struct AnswerReturn {
         deserialize_with = "deserialize_json_string",
         default
     )]
+    /// The Value that got returned
     pub return_value: Value,
 }
 
@@ -485,6 +513,7 @@ impl TryFrom<Answer> for AnswerGameSaved {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerObjectCreated {
+    /// Guid of the object that got created
     #[serde(rename = "guid")]
     pub guid: String,
 }

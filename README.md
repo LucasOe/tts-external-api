@@ -34,7 +34,7 @@ You can send four types of outgoing messages:
 ### [Get Lua Scripts](https://api.tabletopsimulator.com/externaleditorapi/#get-lua-scripts)
 
 ```rs
-use tts_external_api::{ExternalEditorApi, AnswerReload};
+use tts_external_api::{messages::AnswerReload, ExternalEditorApi};
 
 fn get_lua_scripts(api: ExternalEditorApi) {
 	let answer_reload: AnswerReload = api.get_scripts().unwrap();
@@ -45,7 +45,7 @@ fn get_lua_scripts(api: ExternalEditorApi) {
 ### [Save & Play](https://api.tabletopsimulator.com/externaleditorapi/#save-play)
 
 ```rs
-use tts_external_api::{json, ExternalEditorApi, AnswerReload};
+use tts_external_api::{json, messages::AnswerReload, ExternalEditorApi};
 
 fn save_and_play(api: ExternalEditorApi) {
 	// Objects not mentioned in the script_states are not updated
@@ -68,7 +68,7 @@ fn custom_message(api: ExternalEditorApi) {
 ### [Execute Lua Script](https://api.tabletopsimulator.com/externaleditorapi/#execute-lua-code)
 
 ```rs
-use tts_external_api::{AnswerReturn, ExternalEditorApi};
+use tts_external_api::{messages::AnswerReturn, ExternalEditorApi};
 
 fn execute_lua_script(api: ExternalEditorApi) {
     // JSON strings will be deserialized if possible
@@ -88,7 +88,7 @@ You can also listen to eight types of incoming messages:
 ### [Pushing New Object](https://api.tabletopsimulator.com/externaleditorapi/#pushing-new-object)
 
 ```rs
-use tts_external_api::{AnswerNewObject, ExternalEditorApi};
+use tts_external_api::{messages::AnswerNewObject, ExternalEditorApi};
 
 fn await_new_object(api: ExternalEditorApi) {
     let answer_new_object: AnswerNewObject = api.wait();
@@ -99,7 +99,7 @@ fn await_new_object(api: ExternalEditorApi) {
 ### [Loading a New Game](https://api.tabletopsimulator.com/externaleditorapi/#loading-a-new-game)
 
 ```rs
-use tts_external_api::{AnswerReload, ExternalEditorApi};
+use tts_external_api::{messages::AnswerReload, ExternalEditorApi};
 
 fn await_reload(api: ExternalEditorApi) {
     let answer_reload: AnswerReload = api.wait();
@@ -110,7 +110,7 @@ fn await_reload(api: ExternalEditorApi) {
 ### [Print/Debug Messages](https://api.tabletopsimulator.com/externaleditorapi/#printdebug-messages)
 
 ```rs
-use tts_external_api::{AnswerPrint, ExternalEditorApi};
+use tts_external_api::{messages::AnswerPrint, ExternalEditorApi};
 
 fn await_print(api: ExternalEditorApi) {
     let answer_print: AnswerPrint = api.wait();
@@ -121,7 +121,7 @@ fn await_print(api: ExternalEditorApi) {
 ### [Error Messages](https://api.tabletopsimulator.com/externaleditorapi/#error-messages)
 
 ```rs
-use tts_external_api::{AnswerError, ExternalEditorApi};
+use tts_external_api::{messages::AnswerError, ExternalEditorApi};
 
 fn await_error(api: ExternalEditorApi) {
     let answer_error: AnswerError = api.wait();
@@ -132,7 +132,7 @@ fn await_error(api: ExternalEditorApi) {
 ### [Custom messages](https://api.tabletopsimulator.com/externaleditorapi/#custom-messages)
 
 ```rs
-use tts_external_api::{AnswerCustomMessage, ExternalEditorApi};
+use tts_external_api::{messages::AnswerCustomMessage, ExternalEditorApi};
 
 fn await_custom_message(api: ExternalEditorApi) {
     let answer_custom_message: AnswerCustomMessage = api.wait();
@@ -143,7 +143,7 @@ fn await_custom_message(api: ExternalEditorApi) {
 ### [Return messages](https://api.tabletopsimulator.com/externaleditorapi/#return-messages)
 
 ```rs
-use tts_external_api::{AnswerReturn, ExternalEditorApi};
+use tts_external_api::{messages::AnswerReturn, ExternalEditorApi};
 
 fn await_return(api: ExternalEditorApi) {
     let answer_return: AnswerReturn = api.wait();
@@ -154,7 +154,7 @@ fn await_return(api: ExternalEditorApi) {
 ### [Game Saved](https://api.tabletopsimulator.com/externaleditorapi/#game-saved)
 
 ```rs
-use tts_external_api::{AnswerGameSaved, ExternalEditorApi};
+use tts_external_api::{messages::AnswerGameSaved, ExternalEditorApi};
 
 fn await_game_saved(api: ExternalEditorApi) {
     let answer_game_saved: AnswerGameSaved = api.wait();
@@ -165,7 +165,7 @@ fn await_game_saved(api: ExternalEditorApi) {
 ### [Object Created](https://api.tabletopsimulator.com/externaleditorapi/#object-created)
 
 ```rs
-use tts_external_api::{AnswerObjectCreated, ExternalEditorApi};
+use tts_external_api::{messages::AnswerObjectCreated, ExternalEditorApi};
 
 fn await_object_created(api: ExternalEditorApi) {
     let answer_object_created: AnswerObjectCreated = api.wait();
@@ -178,7 +178,7 @@ fn await_object_created(api: ExternalEditorApi) {
 Or you can wait for any incoming message:
 
 ```rs
-use tts_external_api::{Answer, ExternalEditorApi};
+use tts_external_api::{messages::Answer, ExternalEditorApi};
 
 fn await_message(api: ExternalEditorApi) {
     let answer: Answer = api.read();

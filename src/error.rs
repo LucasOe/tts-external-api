@@ -1,4 +1,4 @@
-use crate::{Answer, Message};
+use crate::messages::{Answer, Message};
 use thiserror::Error;
 
 #[derive(Error, Debug)]

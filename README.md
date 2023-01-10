@@ -1,5 +1,10 @@
 # tts-external-api
 
+[![Latest Version]][crates.io]
+
+[latest version]: https://img.shields.io/crates/v/serde_json.svg
+[crates.io]: https://crates.io/crates/tts-external-api
+
 A Rust implementation of the [External Editor API][1] for Tabletop Simulator.
 
 This is intended to make it easier to write development tools and plugins

@@ -1,4 +1,7 @@
-use crate::{error::Error, Answer, Message};
+use crate::{
+    error::Error,
+    messages::{Answer, Message},
+};
 use std::fmt::Debug;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};

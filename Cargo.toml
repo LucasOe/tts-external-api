@@ -1,9 +1,12 @@
 [package]
 name = "tts-external-api"
 version = "0.1.0"
-edition = "2021"
 authors = ["LucasOe"]
-description = "Attach and update scripts in Tabletop Simulator via the command line."
+edition = "2021"
+description = "Rust implementation of the External Editor API for Tabletop Simulator"
+repository = "https://github.com/LucasOe/tts-external-api"
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -342,12 +342,6 @@ impl TryFrom<Answer> for AnswerReload {
     }
 }
 
-impl AnswerReload {
-    pub fn script_states(&self) -> Value {
-        self.script_states.clone()
-    }
-}
-
 /// TTS sends all `print()` messages in a [`AnswerPrint`] response.
 ///
 /// # Example

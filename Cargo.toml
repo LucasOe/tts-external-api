@@ -1,6 +1,6 @@
 [package]
 name = "tts-external-api"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["LucasOe"]
 edition = "2021"
 description = "Rust implementation of the External Editor API for Tabletop Simulator"

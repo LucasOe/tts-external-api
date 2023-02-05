@@ -8,7 +8,7 @@
 A Rust implementation of the [External Editor API][1] for Tabletop Simulator.
 
 This is intended to make it easier to write development tools and plugins
-intead of using the built-in script editor.
+instead of using the built-in script editor.
 
 [1]: https://api.tabletopsimulator.com/externaleditorapi/
 

@@ -1,4 +1,4 @@
-//! In- and Outcoming messages
+//! Incoming and Outgoing messages
 
 use crate::{error::Error, tcp::ExternalEditorApi, Value};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -17,7 +17,7 @@ pub enum Message {
     /// Represents [Custom Message](https://api.tabletopsimulator.com/externaleditorapi/#custom-message)
     MessageCustomMessage(MessageCustomMessage),
     /// Represents [Execute Lua Code](https://api.tabletopsimulator.com/externaleditorapi/#execute-lua-code)
-    MessageExectute(MessageExecute),
+    MessageExecute(MessageExecute),
 }
 
 // Workaround for: https://github.com/serde-rs/serde/issues/745
@@ -33,7 +33,7 @@ pub enum Message {
 //     #[serde(rename = 2)]
 //     MessageCustomMessage(MessageCustomMessage),
 //     #[serde(rename = 3)]
-//     MessageExectute(MessageExectute),
+//     MessageExecute(MessageExecute),
 // }
 //
 impl Serialize for Message {
@@ -47,7 +47,7 @@ impl Serialize for Message {
             Message::MessageGetScripts(_) => 0,
             Message::MessageReload(_) => 1,
             Message::MessageCustomMessage(_) => 2,
-            Message::MessageExectute(_) => 3,
+            Message::MessageExecute(_) => 3,
         };
         s.serialize_entry("messageID", &id_)?;
 
@@ -55,7 +55,7 @@ impl Serialize for Message {
             Message::MessageGetScripts(t) => t.serialize(FlatMapSerializer(&mut s))?,
             Message::MessageReload(t) => t.serialize(FlatMapSerializer(&mut s))?,
             Message::MessageCustomMessage(t) => t.serialize(FlatMapSerializer(&mut s))?,
-            Message::MessageExectute(t) => t.serialize(FlatMapSerializer(&mut s))?,
+            Message::MessageExecute(t) => t.serialize(FlatMapSerializer(&mut s))?,
         }
 
         s.end()
@@ -176,7 +176,7 @@ impl TryFrom<Message> for MessageExecute {
     type Error = Error;
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
-            Message::MessageExectute(message) => Ok(message),
+            Message::MessageExecute(message) => Ok(message),
             other => Err(Error::MessageError(other)),
         }
     }
@@ -201,9 +201,9 @@ impl MessageExecute {
         }
     }
 
-    /// Returns self as [`Message::MessageExectute`]
+    /// Returns self as [`Message::MessageExecute`]
     pub fn as_message(self) -> Message {
-        Message::MessageExectute(self)
+        Message::MessageExecute(self)
     }
 }
 
@@ -391,7 +391,7 @@ impl TryFrom<Answer> for AnswerPrint {
 /// ```
 #[derive(Deserialize, Debug)]
 pub struct AnswerError {
-    /// Desciption of the error
+    /// Description of the error
     #[serde(rename = "error")]
     pub error: String,
     /// Guid of the object that has the error

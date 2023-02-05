@@ -12,7 +12,7 @@ pub struct ExternalEditorApi {
 }
 
 impl ExternalEditorApi {
-    /// Creates a new ExternalEditorApi struct and binds the TcpListener to its socket adress.
+    /// Creates a new ExternalEditorApi struct and binds the TcpListener to its socket address.
     pub fn new() -> Self {
         let listener = TcpListener::bind("127.0.0.1:39998").unwrap();
         Self { listener }
@@ -28,7 +28,7 @@ impl ExternalEditorApi {
     }
 
     /// Accepts the next incoming [`Answer`] from the listener.
-    /// This function will block the calling thread until a new TCP connection is established and an answer gets recieved.
+    /// This function will block the calling thread until a new TCP connection is established and an answer gets received.
     pub fn read(&self) -> Answer {
         let (mut stream, _addr) = self.listener.accept().unwrap();
         let mut buffer = String::new();
@@ -37,7 +37,7 @@ impl ExternalEditorApi {
     }
 
     /// Reads incoming [`Answer`] messages until an answer matches the generic.
-    /// This function will block the calling thread until a new TCP connection is established and an answer gets recieved.
+    /// This function will block the calling thread until a new TCP connection is established and an answer gets received.
     pub fn wait<T: TryFrom<Answer>>(&self) -> T {
         loop {
             if let Ok(answer) = T::try_from(self.read()) {
@@ -47,7 +47,7 @@ impl ExternalEditorApi {
     }
 }
 
-/// Creates a new ExternalEditorApi struct and binds the TcpListener to its socket adress.
+/// Creates a new ExternalEditorApi struct and binds the TcpListener to its socket address.
 /// This is functionally the same as using `ExternalEditorApi::new()`.
 impl Default for ExternalEditorApi {
     fn default() -> Self {

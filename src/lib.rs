@@ -1,7 +1,7 @@
 //! A Rust implementation of the [External Editor API](https://api.tabletopsimulator.com/externaleditorapi/) for Tabletop Simulator.
 //!
 //! This is intended to make it easier to write development tools and plugins
-//! intead of using the built-in script editor.
+//! instead of using the built-in script editor.
 //!
 //! Communication between the editor and TTS occurs via two localhost TCP connections:
 //! one where TTS listens for messages and one where the [`ExternalEditorApi`] listens for messages.
@@ -9,7 +9,7 @@
 //!
 //! # Quick Start
 //!
-//! All messages are sent and recieved through the [`ExternalEditorApi`] struct.
+//! All messages are sent and received through the [`ExternalEditorApi`] struct.
 //! Creating the struct binds the TcpListener to port 39999. In order for messages to be
 //! sent, a game has to be loaded inside Tabletop Simulator.
 //! ```

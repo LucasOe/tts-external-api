@@ -440,7 +440,6 @@ impl TryFrom<Answer> for AnswerCustomMessage {
 
 /// If code executed with a [`MessageExecute`] message returns a value,
 /// it will be sent back in a [`AnswerReturn`] message.
-/// Tables have to be decoded using `JSON.decode(table)`.
 ///
 /// # Example
 /// ```json

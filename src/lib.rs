@@ -23,8 +23,6 @@
 //! }
 //! ```
 
-#![deny(missing_docs)]
-
 mod error;
 pub mod messages;
 pub mod tcp;
@@ -35,6 +33,7 @@ pub use serde_json::{json, Value};
 /////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
+#[cfg(not(feature = "async"))]
 mod tests {
     use crate::{json, messages, ExternalEditorApi};
 
@@ -83,9 +82,63 @@ mod tests {
     fn test_read() {
         let api = ExternalEditorApi::new();
 
-        loop {
-            let answer = api.read();
-            println!("{:#?}", answer);
-        }
+        let answer = api.read();
+        println!("{:#?}", answer);
+    }
+}
+
+#[cfg(test)]
+#[cfg(feature = "async")]
+mod tests {
+    use crate::{json, messages, ExternalEditorApi};
+
+    #[tokio::test]
+    async fn test_get_scripts() {
+        let api = ExternalEditorApi::new().await;
+
+        let answer = api.get_scripts().await.unwrap();
+        println!("{:#?}", answer.script_states);
+    }
+
+    #[tokio::test]
+    async fn test_reload() {
+        let api = ExternalEditorApi::new().await;
+
+        let answer = api.reload(json!([])).await.unwrap();
+        println!("{:#?}", answer.script_states);
+    }
+
+    #[tokio::test]
+    async fn test_custom_message() {
+        let api = ExternalEditorApi::new().await;
+
+        api.custom_message(json![{"foo": "Foo"}]).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_execute() {
+        let api = ExternalEditorApi::new().await;
+
+        let answer = api
+            .execute(String::from("return JSON.encode({foo = 'Foo'})"))
+            .await
+            .unwrap();
+        println!("{:#?}", answer);
+    }
+
+    #[tokio::test]
+    async fn test_new_object() {
+        let api = ExternalEditorApi::new().await;
+
+        let answer: messages::AnswerNewObject = api.wait().await;
+        println!("{:#?}", answer);
+    }
+
+    #[tokio::test]
+    async fn test_read() {
+        let api = ExternalEditorApi::new().await;
+
+        let answer = api.read().await;
+        println!("{:#?}", answer);
     }
 }

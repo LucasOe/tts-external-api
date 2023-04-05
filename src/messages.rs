@@ -529,6 +529,7 @@ impl TryFrom<Answer> for AnswerObjectCreated {
 
 /////////////////////////////////////////////////////////////////////////////
 
+#[cfg(not(feature = "async"))]
 impl ExternalEditorApi {
     /// Get a list containing the states for every object. Returns an [`AnswerReload`] message on success.
     /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
@@ -579,5 +580,66 @@ impl ExternalEditorApi {
     pub fn execute_on_object(&self, script: String, guid: String) -> io::Result<AnswerReturn> {
         self.send(MessageExecute::new_object(script, guid).as_message())?;
         Ok(self.wait())
+    }
+}
+
+#[cfg(feature = "async")]
+impl ExternalEditorApi {
+    /// Get a list containing the states for every object. Returns an [`AnswerReload`] message on success.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    pub async fn get_scripts(&self) -> io::Result<AnswerReload> {
+        self.send(MessageGetScripts::new().as_message()).await?;
+        Ok(self.wait().await)
+    }
+
+    /// Update the Lua scripts and UI XML for any objects listed in the message,
+    /// and then reloads the save file, the same way it does when pressing "Save & Play" within the in-game editor.
+    /// Returns an [`AnswerReload`] message.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    ///
+    /// Any objects mentioned have both their Lua script and their UI XML updated.
+    /// If no value is set for either the "script" or "ui" key then the
+    /// corresponding Lua script or UI XML is deleted.
+    pub async fn reload(&self, script_states: Value) -> io::Result<AnswerReload> {
+        self.send(MessageReload::new(script_states).as_message())
+            .await?;
+        Ok(self.wait().await)
+    }
+
+    /// Send a custom message to be forwarded to the `onExternalMessage` event handler
+    /// in the currently loaded game. The value of customMessage must be an object,
+    /// and is passed as a parameter to the event handler.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned.
+    ///
+    /// If this value is not an object then the event is not triggered.
+    pub async fn custom_message(&self, message: Value) -> io::Result<()> {
+        self.send(MessageCustomMessage::new(message).as_message())
+            .await?;
+        Ok(())
+    }
+
+    /// Executes a lua script globally and returns the value in a [`AnswerReturn`] message.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    pub async fn execute(&self, script: String) -> io::Result<AnswerReturn> {
+        self.send(MessageExecute::new(script).as_message()).await?;
+        Ok(self.wait().await)
+    }
+
+    /// Executes a lua script on an object and returns the value in a [`AnswerReturn`] message.
+    /// If no connection to the game can be established, an [`io::Error`] gets returned instead.
+    ///
+    /// To execute Lua code for an object in the game that object must have an associated script in TTS.
+    /// Otherwise the TTS scripting engine will fail with an error "function \<executeScript>:
+    /// Object reference not set to an instance of an object".
+    /// Once the in-game editor shows a script associated with an object
+    /// then TTS will be able to execute Lua code sent via JSON message for that object.
+    pub async fn execute_on_object(
+        &self,
+        script: String,
+        guid: String,
+    ) -> io::Result<AnswerReturn> {
+        self.send(MessageExecute::new_object(script, guid).as_message())
+            .await?;
+        Ok(self.wait().await)
     }
 }

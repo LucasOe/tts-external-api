@@ -8,7 +8,8 @@ use std::net::{TcpListener, TcpStream};
 /// A struct representing Tabletop Simulators [External Editor API](https://api.tabletopsimulator.com/externaleditorapi/).
 #[derive(Debug)]
 pub struct ExternalEditorApi {
-    listener: TcpListener,
+    /// TcpListener used for listening to incoming messages
+    pub listener: TcpListener,
 }
 
 impl ExternalEditorApi {

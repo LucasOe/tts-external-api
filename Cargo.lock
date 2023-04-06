@@ -96,7 +96,7 @@ dependencies = [
 
 [[package]]
 name = "tts-external-api"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "serde",
  "serde_json",

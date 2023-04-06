@@ -28,13 +28,19 @@ impl ExternalEditorApi {
         Ok(())
     }
 
-    /// Accepts the next incoming [`Answer`] from the listener.
+    /// Accepts the next incoming [`Answer`] from the listener and deserializes it.
     /// This function will block the calling thread until a new TCP connection is established and an answer gets received.
     pub fn read(&self) -> Answer {
+        serde_json::from_str(&self.read_string()).unwrap()
+    }
+
+    /// Accepts the next incoming [`Answer`] from the listener as a String.
+    /// This function will block the calling thread until a new TCP connection is established and an answer gets received.
+    pub fn read_string(&self) -> String {
         let (mut stream, _addr) = self.listener.accept().unwrap();
         let mut buffer = String::new();
         stream.read_to_string(&mut buffer).unwrap();
-        serde_json::from_str(&buffer).unwrap()
+        buffer
     }
 
     /// Reads incoming [`Answer`] messages until an answer matches the generic.

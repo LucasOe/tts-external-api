@@ -22,8 +22,8 @@ to an active instance.
 use tts_external_api::ExternalEditorApi;
 
 fn main() {
-	let api = ExternalEditorApi::new();
-	api.execute(String::from("print('Hello World')")).unwrap();
+    let api = ExternalEditorApi::new();
+    api.execute(String::from("print('Hello World')")).unwrap();
 }
 ```
 
@@ -37,8 +37,8 @@ You can send four types of outgoing messages:
 use tts_external_api::{messages::AnswerReload, ExternalEditorApi};
 
 fn get_lua_scripts(api: ExternalEditorApi) {
-	let answer_reload: AnswerReload = api.get_scripts().unwrap();
-	println!("{:#?}", answer_reload.script_states);
+    let answer_reload: AnswerReload = api.get_scripts().unwrap();
+    println!("{:#?}", answer_reload.script_states);
 }
 ```
 
@@ -48,9 +48,9 @@ fn get_lua_scripts(api: ExternalEditorApi) {
 use tts_external_api::{json, messages::AnswerReload, ExternalEditorApi};
 
 fn save_and_play(api: ExternalEditorApi) {
-	// Objects not mentioned in the script_states are not updated
-	let answer_reload: AnswerReload = api.reload(json!([])).unwrap();
-	println!("{:#?}", answer_reload);
+    // Objects not mentioned in the script_states are not updated
+    let answer_reload: AnswerReload = api.reload(json!([])).unwrap();
+    println!("{:#?}", answer_reload);
 }
 ```
 
@@ -60,8 +60,8 @@ fn save_and_play(api: ExternalEditorApi) {
 use tts_external_api::{json, ExternalEditorApi, Value};
 
 fn custom_message(api: ExternalEditorApi) {
-	let message: Value = json![{"foo": "Foo", "bar": "Bar"}];
-	api.custom_message(message).unwrap();
+    let message: Value = json![{"foo": "Foo", "bar": "Bar"}];
+    api.custom_message(message).unwrap();
 }
 ```
 
